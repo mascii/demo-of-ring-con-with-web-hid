@@ -99,6 +99,7 @@
 
   const NEUTRAL_STRAIN_VALUE = await getStrainValue(device);
   const NEUTRAL_STRAIN_RADIUS = 0x0400;
+  const NEUTRAL_STRAIN_RADIUS_MARGIN = 0x0010;
   const LEFT_ARROW_KEY_CODE = 37;
   const RIGHT_ARROW_KEY_CODE = 39;
 
@@ -119,11 +120,20 @@
   device.addEventListener('inputreport', event => {
     if (event.reportId === 0x30) {
       isPressing = (strainValue => {
+        if (isPressing) {
+          if (NEUTRAL_STRAIN_VALUE - NEUTRAL_STRAIN_RADIUS + NEUTRAL_STRAIN_RADIUS_MARGIN <=
+            strainValue && strainValue <= NEUTRAL_STRAIN_VALUE + NEUTRAL_STRAIN_RADIUS -
+            NEUTRAL_STRAIN_RADIUS_MARGIN) {
+            return false;
+          }
+          return true;
+        }
+
         if (strainValue < NEUTRAL_STRAIN_VALUE - NEUTRAL_STRAIN_RADIUS) {
-          !isPressing && pressKey(LEFT_ARROW_KEY_CODE);
+          pressKey(LEFT_ARROW_KEY_CODE);
           return true;
         } else if (NEUTRAL_STRAIN_VALUE + NEUTRAL_STRAIN_RADIUS < strainValue) {
-          !isPressing && pressKey(RIGHT_ARROW_KEY_CODE);
+          pressKey(RIGHT_ARROW_KEY_CODE);
           return true;
         }
         return false;
