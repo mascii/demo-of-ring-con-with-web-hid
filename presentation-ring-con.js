@@ -58,11 +58,15 @@
     expectedReport: { 14: 0x30 },
   });
 
+  const extractStrainValueFromBuffer = buffer => {
+    return new DataView(buffer, 38, 2).getInt16(0, true);
+  };
+
   const getStrainValue = device => new Promise(resolve => {
     const checkInputReport = event => {
       if (event.reportId === 0x30) {
-        const strainValue = new Uint8Array(event.data.buffer)[39];
-        if (strainValue !== 0x00) {
+        const strainValue = extractStrainValueFromBuffer(event.data.buffer);
+        if (strainValue !== 0x0000) {
           device.removeEventListener('inputreport', checkInputReport);
           resolve(strainValue);
         }
@@ -94,7 +98,7 @@
   await start_external_polling_5A(device);
 
   const NEUTRAL_STRAIN_VALUE = await getStrainValue(device);
-  const NEUTRAL_STRAIN_RADIUS = 0x04;
+  const NEUTRAL_STRAIN_RADIUS = 0x0400;
   const LEFT_ARROW_KEY_CODE = 37;
   const RIGHT_ARROW_KEY_CODE = 39;
 
@@ -123,7 +127,7 @@
           return true;
         }
         return false;
-      })(new Uint8Array(event.data.buffer)[39]);
+      })(extractStrainValueFromBuffer(event.data.buffer));
     }
   });
 })();
