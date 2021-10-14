@@ -100,18 +100,20 @@
   const NEUTRAL_STRAIN_VALUE = await getStrainValue(device);
   const NEUTRAL_STRAIN_RADIUS = 0x0400;
   const NEUTRAL_STRAIN_RADIUS_MARGIN = 0x0010;
+  const LEFT_ARROW_KEY = 'ArrowLeft';
   const LEFT_ARROW_KEY_CODE = 37;
+  const RIGHT_ARROW_KEY = 'ArrowRight';
   const RIGHT_ARROW_KEY_CODE = 39;
 
   console.log('Ready!');
   console.log('NEUTRAL_STRAIN_VALUE:', NEUTRAL_STRAIN_VALUE);
   await blinkLed(device);
 
-  const pressKey = keyCode => {
+  const pressKey = (key, keyCode) => {
     const activeElement = document.activeElement;
     const targetDocument = activeElement.tagName === 'IFRAME' ? activeElement.contentDocument : document;
     ['keydown', 'keyup'].forEach(typeArg => {
-      targetDocument.body.dispatchEvent(new KeyboardEvent(typeArg, { keyCode, bubbles: true }));
+      targetDocument.body.dispatchEvent(new KeyboardEvent(typeArg, { key, keyCode, bubbles: true }));
     });
   };
 
@@ -130,10 +132,10 @@
         }
 
         if (strainValue < NEUTRAL_STRAIN_VALUE - NEUTRAL_STRAIN_RADIUS) {
-          pressKey(LEFT_ARROW_KEY_CODE);
+          pressKey(LEFT_ARROW_KEY, LEFT_ARROW_KEY_CODE);
           return true;
         } else if (NEUTRAL_STRAIN_VALUE + NEUTRAL_STRAIN_RADIUS < strainValue) {
-          pressKey(RIGHT_ARROW_KEY_CODE);
+          pressKey(RIGHT_ARROW_KEY, RIGHT_ARROW_KEY_CODE);
           return true;
         }
         return false;
